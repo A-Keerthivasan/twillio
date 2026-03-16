@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AquaAssistant - Send Alert</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #e0f7fa;
+      overflow: hidden;
+    }
+
+    body {
+      background: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGpqNWV0MjVod3dwcWZkajI5dHNrdGpub2czc2Qzc3Jhdm00ZWcxYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VI2UC13hwWin1MIfmi/giphy.gif') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0, 0, 30, 0.6);
+      z-index: 0;
+    }
+
+    .card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 40, 60, 0.75);
+      padding: 40px;
+      max-width: 400px;
+      border-radius: 16px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    select, button {
+      margin: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 20px;
+      color: #81d4fa;
+      font-weight: bold;
+    }
+  </style>
+  <script>
+    function sendAlert() {
+      const recipient = document.getElementById('recipient').value;
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = 'Sending alert...';
+
+      fetch('/send-alert', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({recipient})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.message){
+          statusElement.textContent = data.message;
+          statusElement.style.color = '#00e676';
+        } else if(data.error){
+          statusElement.textContent = 'Error: ' + data.error;
+          statusElement.style.color = '#ff5252';
+        }
+      })
+      .catch(error => {
+        statusElement.textContent = 'Error: ' + error;
+        statusElement.style.color = '#ff5252';
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="card">
+    <h2>AquaAssistant Alert System</h2>
+    <label for="recipient">Select Recipient:</label>
+    <select id="recipient">
+      <option value="Public">Public</option>
+      <option value="DWLR Service Manager">DWLR Service Manager</option>
+      <option value="Corporation">Corporation</option>
+      <option value="Farmer">Farmer</option>
+    </select>
+    <button onclick="sendAlert()">Send Alert</button>
+    <div id="status"></div>
+  </div>
+</body>
+</html>
